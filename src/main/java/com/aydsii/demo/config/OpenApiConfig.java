@@ -12,7 +12,8 @@ public class OpenApiConfig {
     public OpenAPI verdeGreenOpenApi() {
         return new OpenAPI().info(new Info()
                 .title("VerdeGreen API")
-                .description("AyDS II 2026 - Grupo 10 - CU-01 Comprar y CU-02 Consultar seguimiento de compra")
+                .description("AyDS II 2026 - Grupo 10 - CU-01 Comprar, CU-02 Consultar seguimiento de compra, "
+                        + "CU-03 Consultar historial de ventas y CU-04 Cancelar pedido")
                 .version("1.0"));
     }
 }

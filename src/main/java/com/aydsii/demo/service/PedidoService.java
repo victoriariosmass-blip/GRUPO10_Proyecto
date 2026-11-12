@@ -1,5 +1,6 @@
 package com.aydsii.demo.service;
 
+import com.aydsii.demo.dto.CancelacionDTO;
 import com.aydsii.demo.dto.CompraRequestDTO;
 import com.aydsii.demo.dto.PedidoResponseDTO;
 import com.aydsii.demo.exception.RecursoNoEncontradoException;
@@ -16,7 +17,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * CU-01 Comprar.
+ * CU-01 Comprar y CU-04 Cancelar pedido.
  * Sigue el mismo orden de mensajes que el diagrama de secuencia.
  * El límite por categoría y el stock NO se validan acá: se controlan al agregar
  * productos al carrito (RN-02), así que el carrito ya llega con cantidades válidas.
@@ -108,6 +109,55 @@ public class PedidoService {
         notificacionService.notificarNuevoPedido(pedido);
         String enlace = notificacionService.generarEnlaceWhatsApp(pedido);
         return new PedidoResponseDTO(pedido, envio, enlace);
+    }
+
+    /**
+     * CU-04 Cancelar pedido. Sigue el orden de mensajes del diagrama de secuencia.
+     * La confirmación del cliente (pasos 3 y 4) pasa en la pantalla: si no confirma, no se llama a este método.
+     */
+    @Transactional
+    public CancelacionDTO cancelarPedido(Long idPedido) {
+        // 1.1.1: buscar el pedido. Como en el CU-02, el id viaja oculto desde el historial del cliente;
+        // el orElseThrow es solo técnico (por si se prueba un id inventado desde Swagger).
+        Pedido pedido = pedidoRepository.findById(idPedido)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Pedido no encontrado"));
+
+        // 1.1.2: break [false] -> FE-01 (RN-01)
+        if (!pedido.sePuedeCancelar()) {
+            throw new ReglaNegocioException("El pedido no se puede cancelar en su estado actual ("
+                    + pedido.getEstado() + "). Solo se cancela antes de estar LISTO.");
+        }
+
+        // 1.1.3 y 1.1.4: se pregunta ANTES de cancelar, porque después el estado ya es CANCELADO
+        boolean enProduccion = pedido.estaEnProduccion();
+        boolean pagoAcreditado = pedido.tienePagoAcreditado();
+
+        // 1.1.5: cancelar() -> cambiarEstado(CANCELADO) -> «create» CambioEstado (RN-02)
+        pedido.cancelar();
+
+        // 1.1.6 a 1.1.9: loop sobre el detalle, se libera el stock reservado (RN-03).
+        // El producto se actualiza solo porque el método es @Transactional (no hace falta ProductoRepository).
+        for (DetallePedido detalle : pedido.getDetalles()) {
+            Producto producto = detalle.getProducto();
+            int cantidad = detalle.getCantidad();
+            producto.liberarStock(cantidad);
+        }
+
+        // 1.1.10: guardar
+        pedido = pedidoRepository.save(pedido);
+
+        // 1.1.11 a 1.1.13: notificaciones
+        notificacionService.notificarCancelacion(pedido);
+        if (enProduccion) {
+            notificacionService.notificarCancelacionProduccion(pedido);        // FA-01
+        }
+        String enlace = null;
+        if (pagoAcreditado) {
+            enlace = notificacionService.generarEnlaceDevolucion(pedido);     // FA-02
+        }
+
+        // 1.1.14: respuesta
+        return new CancelacionDTO(pedido, pagoAcreditado, enlace);
     }
 
     private ParametroSistema buscarParametro(String clave) {

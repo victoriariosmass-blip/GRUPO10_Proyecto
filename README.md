@@ -131,3 +131,5 @@ La configuración está en [log4j2-spring.xml](src/main/resources/log4j2-spring.
 A partir de acá, cada fork es un proyecto independiente: no se sincroniza con el original ni con los forks de los demás.
 
 Reemplazá `<tu-usuario>` y `<repositorio>` por los datos reales.
+
+

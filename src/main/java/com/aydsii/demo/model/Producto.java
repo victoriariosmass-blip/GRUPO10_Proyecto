@@ -43,6 +43,11 @@ public class Producto {
         this.stock -= cantidad;
     }
 
+    /** CU-04, RN-03: devuelve al stock las unidades que había reservado el pedido. */
+    public void liberarStock(int cantidad) {
+        this.stock += cantidad;
+    }
+
     public boolean bajoStockMinimo() {
         return stock < stockMinimo;
     }

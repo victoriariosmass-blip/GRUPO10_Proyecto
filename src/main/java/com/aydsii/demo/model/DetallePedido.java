@@ -43,6 +43,10 @@ public class DetallePedido {
         this.subtotal = precioUnitario.multiply(BigDecimal.valueOf(cantidad));
     }
 
+    public Producto getProducto() {
+        return producto;
+    }
+
     public BigDecimal getSubtotal() {
         return subtotal;
     }

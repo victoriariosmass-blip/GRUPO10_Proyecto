@@ -8,5 +8,15 @@ public enum EstadoPedido {
     EN_CAMINO,
     ENTREGADO,
     CANCELADO,
-    RECHAZADO
+    RECHAZADO;
+
+    /**
+     * CU-03, RN-01: un pedido cuenta como venta cuando el pago ya fue acreditado,
+     * es decir, desde CONFIRMADO en adelante. ACEPTADO (sin acreditar), CANCELADO
+     * y RECHAZADO no son ventas.
+     */
+    public boolean esVenta() {
+        return this == CONFIRMADO || this == EN_PRODUCCION || this == LISTO
+                || this == EN_CAMINO || this == ENTREGADO;
+    }
 }

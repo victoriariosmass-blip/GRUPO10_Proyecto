@@ -1,10 +1,12 @@
 package com.aydsii.demo.controller;
 
 import com.aydsii.demo.dto.ApiResponse;
+import com.aydsii.demo.dto.CancelacionDTO;
 import com.aydsii.demo.dto.CompraRequestDTO;
 import com.aydsii.demo.dto.PedidoResponseDTO;
 import com.aydsii.demo.service.PedidoService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -14,7 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/pedidos")
-@Tag(name = "CU-01 Comprar", description = "Registra un pedido a partir del carrito del cliente")
+@Tag(name = "Pedidos (CU-01 Comprar y CU-04 Cancelar pedido)",
+        description = "Registra un pedido a partir del carrito del cliente y permite cancelarlo antes de que esté listo")
 public class PedidoController {
 
     private final PedidoService pedidoService;
@@ -40,5 +43,22 @@ public class PedidoController {
         PedidoResponseDTO respuesta = pedidoService.crearPedido(dto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse<>(HttpStatus.CREATED.value(), "Pedido creado con éxito", respuesta));
+    }
+
+    @PutMapping("/{idPedido}/cancelar")
+    @Operation(summary = "CU-04 Cancelar pedido",
+            description = "Se invoca desde el historial del cliente, después de que confirma la cancelación. "
+                    + "Pasa el pedido a CANCELADO, devuelve el stock reservado y avisa a Ventas (y a Producción si "
+                    + "estaba en producción). Si el pago ya estaba acreditado, devuelve un enlace de WhatsApp para "
+                    + "coordinar la devolución del dinero. Solo se puede cancelar en ACEPTADO, CONFIRMADO o EN_PRODUCCION.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Pedido cancelado"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400",
+                    description = "El pedido no se puede cancelar en su estado actual (FE-01)")
+    })
+    public ResponseEntity<ApiResponse<CancelacionDTO>> cancelar(
+            @Parameter(description = "Id del pedido a cancelar", example = "101") @PathVariable Long idPedido) {
+        CancelacionDTO respuesta = pedidoService.cancelarPedido(idPedido);
+        return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.value(), "Pedido cancelado", respuesta));
     }
 }
