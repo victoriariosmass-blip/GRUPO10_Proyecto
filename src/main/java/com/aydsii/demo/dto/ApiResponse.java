@@ -1,18 +1,17 @@
 package com.aydsii.demo.dto;
 
 /**
- * Formato estándar de respuesta: {status, messege, data}.
- * "messege" va escrito así a propósito, igual que en la consigna del TP2.
+ * Formato estándar de respuesta: {status, message, data}.
  */
 public class ApiResponse<T> {
 
     private int status;
-    private String messege;
+    private String message;
     private T data;
 
-    public ApiResponse(int status, String messege, T data) {
+    public ApiResponse(int status, String message, T data) {
         this.status = status;
-        this.messege = messege;
+        this.message = message;
         this.data = data;
     }
 
@@ -20,8 +19,8 @@ public class ApiResponse<T> {
         return status;
     }
 
-    public String getMessege() {
-        return messege;
+    public String getMessage() {
+        return message;
     }
 
     public T getData() {

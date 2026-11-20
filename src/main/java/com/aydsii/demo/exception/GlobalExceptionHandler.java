@@ -17,7 +17,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** Todos los errores salen con el formato {status, messege, data}. */
+/** Todos los errores salen con el formato {status, message, data}. */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
