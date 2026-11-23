@@ -38,7 +38,8 @@ public class FiltroVentasDTO {
         return hasta != null ? hasta : LocalDate.now();
     }
 
-    /** FE-01: la fecha desde no puede ser posterior a la fecha hasta. */
+    /** FE-01: la fecha desde no puede ser posterior a la fecha hasta, las fechas
+     * ingresadas no pueden ser posteriores a la fecha actual.  */
     public boolean periodoValido() {
         return !getDesde().isAfter(getHasta())
                 && !getDesde().isAfter(LocalDate.now())
