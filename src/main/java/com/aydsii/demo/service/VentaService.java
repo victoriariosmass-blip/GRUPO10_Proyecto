@@ -8,6 +8,8 @@ import com.aydsii.demo.exception.ReglaNegocioException;
 import com.aydsii.demo.model.EstadoPedido;
 import com.aydsii.demo.model.Pedido;
 import com.aydsii.demo.repository.PedidoRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,9 @@ import java.util.List;
  */
 @Service
 public class VentaService {
+
+    // SLF4J: la clase solo conoce la interfaz Logger; la implementación (Log4j2) la elige el pom.xml
+    private static final Logger log = LoggerFactory.getLogger(VentaService.class);
 
     private final PedidoRepository pedidoRepository;
 
@@ -39,6 +44,7 @@ public class VentaService {
         LocalDate desde = filtro.getDesde();
         LocalDate hasta = filtro.getHasta();
         List<EstadoPedido> estados = filtro.getEstados();
+        log.debug("Consulta de historial de ventas: desde {}, hasta {}, estados {}", desde, hasta, estados);
 
         // 1.1.5: una sola consulta. "hasta" es inclusive, por eso se busca hasta el inicio del día siguiente.
         // Si se filtró por un estado que no es de venta, la lista de estados viene vacía y no hay nada que buscar.
@@ -54,6 +60,7 @@ public class VentaService {
 
         // 1.1.7 y 1.1.8: métricas y respuesta
         MetricasVentasDTO metricas = new MetricasVentasDTO(ventas);
+        log.info("Historial de ventas consultado: {} ventas entre {} y {}", ventas.size(), desde, hasta);
         return new HistorialVentasDTO(desde, hasta, ventas, metricas);
     }
 }

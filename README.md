@@ -118,6 +118,32 @@ La configuración está en [log4j2-spring.xml](src/main/resources/log4j2-spring.
 - Consola y archivo rotativo en `logs/demo.log` (rota por día o a los 10 MB, conserva 30 días).
 - Nivel `debug` para `com.aydsii`, `info` para el resto.
 
+## Patrones de diseño (segunda iteración)
+
+### Singleton: `RegistroNotificaciones`
+
+[RegistroNotificaciones](src/main/java/com/aydsii/demo/util/RegistroNotificaciones.java) guarda en memoria todas las notificaciones que emite el sistema (a Ventas, a Producción y al cliente). Es un Singleton clásico, hecho a mano y sin Spring:
+
+- **Constructor privado:** nadie puede crear la clase con `new`.
+- **Atributo estático `instancia`:** guarda la única instancia.
+- **`getInstance()`** es el único punto de acceso: crea la instancia la primera vez (inicialización perezosa) y después devuelve siempre la misma. Es `synchronized` para que dos peticiones concurrentes no creen dos instancias.
+
+[NotificacionService](src/main/java/com/aydsii/demo/service/NotificacionService.java) registra cada notificación con `RegistroNotificaciones.getInstance().registrar(...)`, además de escribirla en el log.
+
+**Cómo probarlo:** hacé una compra (`POST` de CU-01) o cancelá el pedido 101 (CU-04, datos de `sql/datos_prueba_cu03_cu04.sql`), y después consultá `GET /api/notificaciones` desde Swagger. Las notificaciones quedan en memoria, así que se pierden al reiniciar la aplicación.
+
+### Simple Logging Facade for Java (SLF4J)
+
+El código usa solo la fachada SLF4J (`org.slf4j.Logger` y `LoggerFactory`) y no depende de ninguna librería de logging concreta. La implementación es **Log4j2**, elegida en el `pom.xml` (`spring-boot-starter-log4j2`, con `spring-boot-starter-logging` excluido). Para cambiarla basta con cambiar la dependencia, sin tocar el código. La configuración está en [log4j2-spring.xml](src/main/resources/log4j2-spring.xml) (ver "Logging"). Los mensajes usan placeholders `{}`, nunca concatenación.
+
+| Clase | Nivel | Qué loguea |
+|---|---|---|
+| `PedidoService` | `info` | Pedido creado (CU-01) y pedido cancelado (CU-04) |
+| `VentaService` | `debug` / `info` | Filtros de la consulta y cantidad de ventas del historial (CU-03) |
+| `EnvioService` | `info` | Seguimiento consultado (CU-02) |
+| `NotificacionService` | `info` / `warn` / `debug` | Notificaciones a Ventas y Producción, enlace de WhatsApp generado |
+| `GlobalExceptionHandler` | `warn` / `error` | Reglas de negocio no cumplidas, recursos no encontrados y errores no controlados |
+
 ## Fork: mismo punto de partida para todos
 
 1. **Hacer el fork:** desde la página del repositorio original, botón **Fork** y elegir tu cuenta.

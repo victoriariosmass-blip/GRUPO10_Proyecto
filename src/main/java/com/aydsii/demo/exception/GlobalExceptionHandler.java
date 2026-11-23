@@ -21,6 +21,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // SLF4J: la clase solo conoce la interfaz Logger; la implementación (Log4j2) la elige el pom.xml
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -50,11 +51,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ReglaNegocioException.class)
     public ResponseEntity<ApiResponse<Object>> manejarReglaNegocio(ReglaNegocioException ex) {
+        log.warn("Regla de negocio no cumplida: {}", ex.getMessage());
         return responder(HttpStatus.BAD_REQUEST, ex.getMessage(), null);
     }
 
     @ExceptionHandler(RecursoNoEncontradoException.class)
     public ResponseEntity<ApiResponse<Object>> manejarNoEncontrado(RecursoNoEncontradoException ex) {
+        log.warn("Recurso no encontrado: {}", ex.getMessage());
         return responder(HttpStatus.NOT_FOUND, ex.getMessage(), null);
     }
 

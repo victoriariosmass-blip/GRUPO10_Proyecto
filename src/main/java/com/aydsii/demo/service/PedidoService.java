@@ -10,6 +10,8 @@ import com.aydsii.demo.repository.CarritoRepository;
 import com.aydsii.demo.repository.EnvioRepository;
 import com.aydsii.demo.repository.ParametroRepository;
 import com.aydsii.demo.repository.PedidoRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,9 @@ import java.time.LocalDateTime;
  */
 @Service
 public class PedidoService {
+
+    // SLF4J: la clase solo conoce la interfaz Logger; la implementación (Log4j2) la elige el pom.xml
+    private static final Logger log = LoggerFactory.getLogger(PedidoService.class);
 
     private static final String HORAS_VENCIMIENTO = "HORAS_VENCIMIENTO";
     private static final String COSTO_ENVIO = "COSTO_ENVIO";
@@ -108,6 +113,8 @@ public class PedidoService {
         // 1.1.28 a 1.1.30: notificaciones y respuesta
         notificacionService.notificarNuevoPedido(pedido);
         String enlace = notificacionService.generarEnlaceWhatsApp(pedido);
+        log.info("Pedido #{} creado: cliente #{}, {}, total ${}",
+                pedido.getId(), cliente.getId(), pedido.getTipoEntrega(), pedido.getTotal());
         return new PedidoResponseDTO(pedido, envio, enlace);
     }
 
@@ -157,6 +164,8 @@ public class PedidoService {
         }
 
         // 1.1.14: respuesta
+        log.info("Pedido #{} cancelado (pago acreditado: {}, estaba en producción: {})",
+                pedido.getId(), pagoAcreditado, enProduccion);
         return new CancelacionDTO(pedido, pagoAcreditado, enlace);
     }
 

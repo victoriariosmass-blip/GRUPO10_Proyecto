@@ -6,6 +6,8 @@ import com.aydsii.demo.model.CambioEstado;
 import com.aydsii.demo.model.Envio;
 import com.aydsii.demo.model.Pedido;
 import com.aydsii.demo.repository.EnvioRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +20,9 @@ import java.util.List;
  */
 @Service
 public class EnvioService {
+
+    // SLF4J: la clase solo conoce la interfaz Logger; la implementación (Log4j2) la elige el pom.xml
+    private static final Logger log = LoggerFactory.getLogger(EnvioService.class);
 
     private final EnvioRepository envioRepository;
 
@@ -36,6 +41,8 @@ public class EnvioService {
         // 1.1.2 a 1.1.7: estado actual, datos del envío e historial
         Pedido pedido = envio.getPedido();
         List<CambioEstado> historial = pedido.getHistorial();
+        log.info("Seguimiento consultado: envío #{} del pedido #{} (estado {})",
+                envio.getId(), pedido.getId(), pedido.getEstado());
         return new SeguimientoDTO(envio, pedido, historial);
     }
 }
