@@ -23,9 +23,6 @@ public class FiltroVentasDTO {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate hasta;
 
-    @Schema(description = "Estado para filtrar. Si no viene, se buscan todos los estados que cuentan como venta.")
-    private EstadoPedido estado;
-
     public FiltroVentasDTO() {
     }
 
@@ -51,22 +48,17 @@ public class FiltroVentasDTO {
      * Si se filtra por un estado que no es de venta, la lista queda vacía y no se devuelven pedidos.
      */
     public List<EstadoPedido> getEstados() {
-        if (estado == null) {
-            return Arrays.stream(EstadoPedido.values()).filter(EstadoPedido::esVenta).toList();
-        }
-        return estado.esVenta() ? List.of(estado) : List.of();
+        return Arrays.stream(EstadoPedido.values())
+                .filter(EstadoPedido::esVenta)
+                .toList();
     }
 
-    // Setters: los usa Spring para cargar los query params
+    // setters: los usa Spring para cargar los query params
     public void setDesde(LocalDate desde) {
         this.desde = desde;
     }
 
     public void setHasta(LocalDate hasta) {
         this.hasta = hasta;
-    }
-
-    public void setEstado(EstadoPedido estado) {
-        this.estado = estado;
     }
 }

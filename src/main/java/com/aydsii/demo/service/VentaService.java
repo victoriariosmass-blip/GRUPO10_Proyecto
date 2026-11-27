@@ -35,30 +35,28 @@ public class VentaService {
 
     @Transactional(readOnly = true)
     public HistorialVentasDTO obtenerHistorial(FiltroVentasDTO filtro) {
-        // 1.1.1: break [false] -> FE-01
+        // excepcion 01
         if (!filtro.periodoValido()) {
             throw new ReglaNegocioException("El período es inválido: la fecha desde es posterior a la fecha hasta");
         }
 
-        // 1.1.2 a 1.1.4: período (mes en curso si no viene, FA-01) y estados de venta (RN-01)
+        // período (mes en curso si no viene, FA-01) y estados de venta (RN-01)
         LocalDate desde = filtro.getDesde();
         LocalDate hasta = filtro.getHasta();
         List<EstadoPedido> estados = filtro.getEstados();
         log.debug("Consulta de historial de ventas: desde {}, hasta {}, estados {}", desde, hasta, estados);
 
-        // 1.1.5: una sola consulta. "hasta" es inclusive, por eso se busca hasta el inicio del día siguiente.
-        // Si se filtró por un estado que no es de venta, la lista de estados viene vacía y no hay nada que buscar.
-        List<Pedido> pedidos = estados.isEmpty()
-                ? List.of()
-                : pedidoRepository.buscarVentas(desde.atStartOfDay(), hasta.plusDays(1).atStartOfDay(), estados);
+        // "hasta" es inclusive, por eso se busca hasta el inicio del día siguiente
+        List<Pedido> pedidos =
+                 pedidoRepository.buscarVentas(desde.atStartOfDay(), hasta.plusDays(1).atStartOfDay(), estados);
 
-        // 1.1.6: loop [pedido en pedidos] -> «create» VentaDTO
+        // loop pedido en pedidos -> «create» VentaDTO
         List<VentaDTO> ventas = new ArrayList<>();
         for (Pedido pedido : pedidos) {
             ventas.add(new VentaDTO(pedido));
         }
 
-        // 1.1.7 y 1.1.8: métricas y respuesta
+        // métricas y respuesta
         MetricasVentasDTO metricas = new MetricasVentasDTO(ventas);
         log.info("Historial de ventas consultado: {} ventas entre {} y {}", ventas.size(), desde, hasta);
         return new HistorialVentasDTO(desde, hasta, ventas, metricas);

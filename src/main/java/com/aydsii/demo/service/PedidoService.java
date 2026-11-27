@@ -119,41 +119,40 @@ public class PedidoService {
     }
 
     /**
-     * CU-04 Cancelar pedido. Sigue el orden de mensajes del diagrama de secuencia.
-     * La confirmación del cliente (pasos 3 y 4) pasa en la pantalla: si no confirma, no se llama a este método.
+     * CU-04 Cancelar pedido.
      */
     @Transactional
     public CancelacionDTO cancelarPedido(Long idPedido) {
-        // 1.1.1: buscar el pedido. Como en el CU-02, el id viaja oculto desde el historial del cliente;
-        // el orElseThrow es solo técnico (por si se prueba un id inventado desde Swagger).
+        // buscar el pedido
+        // el orElseThrow es por si se prueba un id inventado desde Swagger
         Pedido pedido = pedidoRepository.findById(idPedido)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Pedido no encontrado"));
 
-        // 1.1.2: break [false] -> FE-01 (RN-01)
+        // break [false] -> FE-01 (RN-01)
         if (!pedido.sePuedeCancelar()) {
             throw new ReglaNegocioException("El pedido no se puede cancelar en su estado actual ("
                     + pedido.getEstado() + "). Solo se cancela antes de estar LISTO.");
         }
 
-        // 1.1.3 y 1.1.4: se pregunta ANTES de cancelar, porque después el estado ya es CANCELADO
+        // se pregunta ANTES de cancelar, porque después el estado ya es CANCELADO
         boolean enProduccion = pedido.estaEnProduccion();
         boolean pagoAcreditado = pedido.tienePagoAcreditado();
 
-        // 1.1.5: cancelar() -> cambiarEstado(CANCELADO) -> «create» CambioEstado (RN-02)
+        // cancelar() -> cambiarEstado(CANCELADO) -> «create» CambioEstado (RN-02)
         pedido.cancelar();
 
-        // 1.1.6 a 1.1.9: loop sobre el detalle, se libera el stock reservado (RN-03).
-        // El producto se actualiza solo porque el método es @Transactional (no hace falta ProductoRepository).
+        // loop sobre el detalle, se libera el stock reservado (RN-03).
+        /* El producto se actualiza solo porque el metodo es @Transactional (no hace falta ProductoRepository). */
         for (DetallePedido detalle : pedido.getDetalles()) {
             Producto producto = detalle.getProducto();
             int cantidad = detalle.getCantidad();
             producto.liberarStock(cantidad);
         }
 
-        // 1.1.10: guardar
+        // guardar
         pedido = pedidoRepository.save(pedido);
 
-        // 1.1.11 a 1.1.13: notificaciones
+        // notificaciones
         notificacionService.notificarCancelacion(pedido);
         if (enProduccion) {
             notificacionService.notificarCancelacionProduccion(pedido);        // FA-01
@@ -163,7 +162,7 @@ public class PedidoService {
             enlace = notificacionService.generarEnlaceDevolucion(pedido);     // FA-02
         }
 
-        // 1.1.14: respuesta
+        // respuesta
         log.info("Pedido #{} cancelado (pago acreditado: {}, estaba en producción: {})",
                 pedido.getId(), pagoAcreditado, enProduccion);
         return new CancelacionDTO(pedido, pagoAcreditado, enlace);

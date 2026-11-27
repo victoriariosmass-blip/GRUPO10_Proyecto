@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 @Service
 public class NotificacionService {
 
-    // SLF4J: la clase solo conoce la interfaz Logger; la implementación (Log4j2) la elige el pom.xml
+    // SLF4J: la clase solo conoce la interfaz Logger, la implementación (Log4j2) esta en pom.xml
     private static final Logger log = LoggerFactory.getLogger(NotificacionService.class);
 
     private static final String VENTAS = "VENTAS";

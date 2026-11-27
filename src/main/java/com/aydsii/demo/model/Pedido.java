@@ -46,12 +46,12 @@ public class Pedido {
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
-    // Composición Pedido ◆-> DetallePedido (1 a 1..*)
+    // Composición Pedido -> DetallePedido (1 a 1..*)
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "pedido_id", nullable = false)
     private List<DetallePedido> detalles = new ArrayList<>();
 
-    // Composición Pedido ◆-> CambioEstado (1 a 1..*)
+    // Composición Pedido -> CambioEstado (1 a 1..*)
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "pedido_id", nullable = false)
     @OrderBy("fechaHora ASC")
@@ -74,7 +74,7 @@ public class Pedido {
         this.total = BigDecimal.ZERO;
     }
 
-    /** Copia el producto al detalle (snapshot) y suma el subtotal al total. */
+    /** copia el producto al detalle (snapshot) y suma el subtotal al total. */
     public void agregarDetalle(Producto producto, int cantidad) {
         DetallePedido detalle = new DetallePedido(producto, cantidad);
         detalles.add(detalle);

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/ventas")
 @Tag(name = "CU-03 Consultar historial de ventas",
-        description = "Ventas de un período con sus métricas (para el personal de Ventas)")
+        description = "Ventas de un período con sus métricas (para el personal de ventas)")
 public class VentaController {
 
     private final VentaService ventaService;

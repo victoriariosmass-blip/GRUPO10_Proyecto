@@ -7,7 +7,7 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.ArrayList;
 
-/** CU-03, paso 6: métricas del período. Si no hay ventas quedan en cero (FA-02). */
+/** CU-03: métricas del período. Si no hay ventas quedan en cero (FA-02). */
 public class MetricasVentasDTO {
 
     private int cantidadVentas;
