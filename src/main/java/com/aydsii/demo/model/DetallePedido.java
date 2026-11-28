@@ -33,7 +33,7 @@ public class DetallePedido {
     protected DetallePedido() {
     }
 
-    /** RN-05: snapshot inmutable, copia código, nombre y precio del momento. */
+    /** snapshot inmutable, copia código, nombre y precio del momento */
     public DetallePedido(Producto producto, int cantidad) {
         this.producto = producto;
         this.codigoProducto = producto.getCodigo();

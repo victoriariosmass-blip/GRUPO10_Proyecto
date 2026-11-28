@@ -11,11 +11,6 @@ import org.springframework.stereotype.Service;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-/**
- * Notificaciones de los CU Comprar (CU-01) y Cancelar pedido (CU-04).
- * Las notificaciones push quedan fuera del alcance: se registran en el log de la aplicación
- * y, además, en el Singleton RegistroNotificaciones (se consultan con GET /api/notificaciones).
- */
 @Service
 public class NotificacionService {
 
@@ -32,7 +27,7 @@ public class NotificacionService {
         this.telefonoEmpresa = telefonoEmpresa;
     }
 
-    /** Aviso a Ventas: nuevo pedido con comprobante (estado ACEPTADO). */
+    /** aviso a ventas: nuevo pedido con comprobante (estado ACEPTADO) */
     public void notificarNuevoPedido(Pedido pedido) {
         log.info("[NOTIFICACION -> VENTAS] Nuevo pedido #{} con comprobante '{}' (total ${})",
                 pedido.getId(), pedido.getComprobante(), pedido.getTotal());
@@ -41,7 +36,7 @@ public class NotificacionService {
                         + "' (total $" + pedido.getTotal() + ")");
     }
 
-    /** Aviso a Producción: el producto quedó debajo de su stock mínimo. */
+    /** aviso a producción: el producto quedó debajo de su stock mínimo */
     public void notificarStockMinimo(Producto producto) {
         log.warn("[NOTIFICACION -> PRODUCCION] Stock mínimo: '{}' ({}) quedó con {} unidades",
                 producto.getNombre(), producto.getCodigo(), producto.getStock());
@@ -50,7 +45,7 @@ public class NotificacionService {
                         + producto.getStock() + " unidades");
     }
 
-    /** Enlace wa.me con el mensaje que corresponde según el pedido sea personalizado o no. */
+    /** enlace wa.me con el mensaje que corresponde según el pedido sea personalizado o no */
     public String generarEnlaceWhatsApp(Pedido pedido) {
         String mensaje = pedido.isPersonalizado()
                 ? "Pedido " + pedido.getId() + " enviado, comuníquese por WhatsApp"
@@ -61,7 +56,7 @@ public class NotificacionService {
         return armarEnlace(mensaje);
     }
 
-    /** CU-04, paso 7: aviso a Ventas de que el cliente canceló el pedido. */
+    /** aviso a ventas de que el cliente canceló el pedido */
     public void notificarCancelacion(Pedido pedido) {
         log.info("[NOTIFICACION -> VENTAS] El cliente canceló el pedido #{} (total ${})",
                 pedido.getId(), pedido.getTotal());
@@ -69,7 +64,7 @@ public class NotificacionService {
                 "El cliente canceló el pedido #" + pedido.getId() + " (total $" + pedido.getTotal() + ")");
     }
 
-    /** CU-04, FA-01: el pedido estaba en producción, Producción tiene que frenar la preparación. */
+    /** el pedido estaba en producción, producción tiene que frenar la preparación */
     public void notificarCancelacionProduccion(Pedido pedido) {
         log.warn("[NOTIFICACION -> PRODUCCION] El pedido #{} estaba en producción y fue cancelado: detener la preparación",
                 pedido.getId());
@@ -77,7 +72,7 @@ public class NotificacionService {
                 "El pedido #" + pedido.getId() + " estaba en producción y fue cancelado: detener la preparación");
     }
 
-    /** CU-04, FA-02: enlace wa.me para que el cliente coordine con Ventas la devolución del dinero (RN-04). */
+    /** enlace wa.me para que el cliente coordine con ventas la devolución del dinero */
     public String generarEnlaceDevolucion(Pedido pedido) {
         String mensaje = "Cancelé el pedido " + pedido.getId() + ", quiero coordinar la devolución del pago";
         RegistroNotificaciones.getInstance().registrar(CLIENTE, mensaje);

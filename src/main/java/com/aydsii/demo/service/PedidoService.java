@@ -18,16 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * CU-01 Comprar y CU-04 Cancelar pedido.
- * Sigue el mismo orden de mensajes que el diagrama de secuencia.
- * El límite por categoría y el stock NO se validan acá: se controlan al agregar
- * productos al carrito (RN-02), así que el carrito ya llega con cantidades válidas.
- */
 @Service
 public class PedidoService {
 
-    // SLF4J: la clase solo conoce la interfaz Logger; la implementación (Log4j2) la elige el pom.xml
+    // SLF4J: la clase solo conoce la interfaz Logger; la implementación (Log4j2) se configura en pom.xml
     private static final Logger log = LoggerFactory.getLogger(PedidoService.class);
 
     private static final String HORAS_VENCIMIENTO = "HORAS_VENCIMIENTO";
@@ -55,7 +49,7 @@ public class PedidoService {
     /** Todo o nada: si algo falla, no queda stock reservado ni pedido guardado. */
     @Transactional
     public PedidoResponseDTO crearPedido(CompraRequestDTO dto) {
-        // 1.1.1 a 1.1.4: carrito del cliente (precondición: activo y con al menos un producto)
+        // carrito del cliente (precondición: activo y con al menos un producto)
         Carrito carrito = carritoRepository.findByClienteId(dto.getClienteId())
                 .orElseThrow(() -> new RecursoNoEncontradoException(
                         "El cliente " + dto.getClienteId() + " no tiene un carrito activo"));
@@ -64,15 +58,15 @@ public class PedidoService {
         }
         Cliente cliente = carrito.getCliente();
 
-        // 1.1.5 y 1.1.6: plazo de vencimiento parametrizado (RN-04)
+        // plazo de vencimiento parametrizado (RN-04)
         int horas = buscarParametro(HORAS_VENCIMIENTO).getValorEntero();
         LocalDateTime vencimiento = LocalDateTime.now().plusHours(horas);
 
-        // 1.1.7: «create» Pedido
+        // «create» Pedido
         Pedido pedido = new Pedido(cliente, dto.getComprobante(), dto.isPersonalizado(),
                 dto.getTipoEntrega(), vencimiento);
 
-        // 1.1.8 a 1.1.13: loop sobre los ítems: arma el detalle y reserva stock
+        // loop sobre los ítems: arma el detalle y reserva stock
         for (ItemCarrito item : carrito.getItems()) {
             Producto producto = item.getProducto();
             int cantidad = item.getCantidad();
@@ -83,7 +77,7 @@ public class PedidoService {
             }
         }
 
-        // 1.1.14 a 1.1.20: costos de entrega y personalización (paso 4 del CU)
+        // costos de entrega y personalización (paso 4 del CU)
         boolean aDomicilio = pedido.esADomicilio();
         BigDecimal costoEnvio = BigDecimal.ZERO;
         if (aDomicilio) {
@@ -95,22 +89,22 @@ public class PedidoService {
         }
         pedido.aplicarCostos(costoEnvio, costoPersonalizacion);
 
-        // 1.1.21 y 1.1.22: estado ACEPTADO con fecha y hora, y se guarda
+        // estado ACEPTADO con fecha y hora, y se guarda
         pedido.cambiarEstado(EstadoPedido.ACEPTADO);
         pedido = pedidoRepository.save(pedido);
 
-        // 1.1.23 a 1.1.25: envío solo si es a domicilio (RN-06)
+        // envío solo si es a domicilio (RN-06)
         Envio envio = null;
         if (aDomicilio) {
             String direccion = cliente.getDireccionEntrega();
             envio = envioRepository.save(new Envio(pedido, direccion));
         }
 
-        // 1.1.26 y 1.1.27: se vacía el carrito
+        // se vacía el carrito
         carrito.vaciar();
         carritoRepository.save(carrito);
 
-        // 1.1.28 a 1.1.30: notificaciones y respuesta
+        // notificaciones y respuesta
         notificacionService.notificarNuevoPedido(pedido);
         String enlace = notificacionService.generarEnlaceWhatsApp(pedido);
         log.info("Pedido #{} creado: cliente #{}, {}, total ${}",
@@ -118,9 +112,6 @@ public class PedidoService {
         return new PedidoResponseDTO(pedido, envio, enlace);
     }
 
-    /**
-     * CU-04 Cancelar pedido.
-     */
     @Transactional
     public CancelacionDTO cancelarPedido(Long idPedido) {
         // buscar el pedido

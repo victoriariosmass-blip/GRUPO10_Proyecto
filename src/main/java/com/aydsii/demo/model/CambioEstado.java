@@ -23,7 +23,7 @@ public class CambioEstado {
     protected CambioEstado() {
     }
 
-    /** RN-07: cada cambio de estado se registra con su fecha y hora. */
+    /** cada cambio de estado se registra con su fecha y hora. */
     public CambioEstado(EstadoPedido estado) {
         this.estado = estado;
         this.fechaHora = LocalDateTime.now();

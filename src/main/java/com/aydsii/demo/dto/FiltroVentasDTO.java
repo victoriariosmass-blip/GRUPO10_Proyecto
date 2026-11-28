@@ -8,10 +8,6 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * CU-03: filtros de la consulta (llegan como query params, los tres opcionales).
- * Resuelve las reglas del período y de los estados para que el service solo las pida.
- */
 public class FiltroVentasDTO {
 
     @Schema(description = "Fecha desde (inclusive). Si no viene, se toma el primer día del mes en curso.",
@@ -26,7 +22,7 @@ public class FiltroVentasDTO {
     public FiltroVentasDTO() {
     }
 
-    /** FA-01: sin período se consulta el mes en curso (RN-04). */
+    //sin período se consulta el mes en curso
     public LocalDate getDesde() {
         return desde != null ? desde : LocalDate.now().withDayOfMonth(1);
     }
@@ -35,7 +31,7 @@ public class FiltroVentasDTO {
         return hasta != null ? hasta : LocalDate.now();
     }
 
-    /** FE-01: la fecha desde no puede ser posterior a la fecha hasta, las fechas
+    /** la fecha desde no puede ser posterior a la fecha hasta, las fechas
      * ingresadas no pueden ser posteriores a la fecha actual.  */
     public boolean periodoValido() {
         return !getDesde().isAfter(getHasta())
@@ -44,8 +40,8 @@ public class FiltroVentasDTO {
     }
 
     /**
-     * RN-01: sin filtro se buscan todos los estados de venta.
-     * Si se filtra por un estado que no es de venta, la lista queda vacía y no se devuelven pedidos.
+     * sin filtro se buscan todos los estados de venta.
+     * si se filtra por un estado que no es de venta, la lista queda vacía y no se devuelven pedidos.
      */
     public List<EstadoPedido> getEstados() {
         return Arrays.stream(EstadoPedido.values())

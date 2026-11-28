@@ -13,11 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * CU-02 Consultar seguimiento de compra.
- * El cliente entra desde su propio historial (ya autenticado) y el id del envío viaja oculto,
- * así que no se contemplan "envío inexistente" ni "compra de otro cliente".
- */
 @Service
 public class EnvioService {
 
@@ -32,13 +27,13 @@ public class EnvioService {
 
     @Transactional(readOnly = true)
     public SeguimientoDTO obtenerSeguimiento(Long idEnvio) {
-        // 1.1.1: buscar el envío.
+        // buscar el envío.
         // findById devuelve Optional: el orElseThrow es solo técnico (por si se prueba un id
-        // inventado desde Swagger), no es un flujo del caso de uso.
+        // inventado desde Swagger), no es un flujo del caso de uso
         Envio envio = envioRepository.findById(idEnvio)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Envío no encontrado"));
 
-        // 1.1.2 a 1.1.7: estado actual, datos del envío e historial
+        // estado actual, datos del envío e historial
         Pedido pedido = envio.getPedido();
         List<CambioEstado> historial = pedido.getHistorial();
         log.info("Seguimiento consultado: envío #{} del pedido #{} (estado {})",

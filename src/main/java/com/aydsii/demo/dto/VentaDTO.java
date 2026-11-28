@@ -8,7 +8,7 @@ import com.aydsii.demo.model.TipoEntrega;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/** CU-03: una fila del historial de ventas. */
+//una fila del historial de ventas
 public class VentaDTO {
 
     private Long pedidoId;

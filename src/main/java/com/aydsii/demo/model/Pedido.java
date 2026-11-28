@@ -82,7 +82,7 @@ public class Pedido {
         total = total.add(detalle.getSubtotal());
     }
 
-    /** Paso 4 del CU-01: suma al total el costo de envío y el de personalización (0 si no corresponden). */
+    /** suma al total el costo de envío y el de personalización (0 si no corresponden). */
     public void aplicarCostos(BigDecimal costoEnvio, BigDecimal costoPersonalizacion) {
         this.costoEnvio = costoEnvio;
         this.costoPersonalizacion = costoPersonalizacion;
@@ -99,24 +99,24 @@ public class Pedido {
         return tipoEntrega == TipoEntrega.DOMICILIO;
     }
 
-    /** CU-04, RN-01: solo se puede cancelar antes de llegar a LISTO. */
+    /** solo se puede cancelar antes de llegar a LISTO. */
     public boolean sePuedeCancelar() {
         return estado == EstadoPedido.ACEPTADO
                 || estado == EstadoPedido.CONFIRMADO
                 || estado == EstadoPedido.EN_PRODUCCION;
     }
 
-    /** CU-04, FA-01: si estaba en producción hay que avisarle a Producción. */
+    /** si estaba en producción hay que avisarle a Producción. */
     public boolean estaEnProduccion() {
         return estado == EstadoPedido.EN_PRODUCCION;
     }
 
-    /** CU-04, FA-02: el pago ya fue acreditado por Ventas (CONFIRMADO o EN_PRODUCCION). */
+    /** el pago ya fue acreditado por Ventas (CONFIRMADO o EN_PRODUCCION). */
     public boolean tienePagoAcreditado() {
         return estado == EstadoPedido.CONFIRMADO || estado == EstadoPedido.EN_PRODUCCION;
     }
 
-    /** CU-04: pasa a CANCELADO y queda registrado el cambio con fecha y hora (RN-02). */
+    /** pasa a CANCELADO y queda registrado el cambio con fecha y hora. */
     public void cancelar() {
         cambiarEstado(EstadoPedido.CANCELADO);
     }

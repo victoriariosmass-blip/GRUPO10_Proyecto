@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 
-/** Datos del seguimiento de una compra con entrega a domicilio. */
+// datos para seguimiento de compras con envio
 public class SeguimientoDTO {
 
     private Long envioId;

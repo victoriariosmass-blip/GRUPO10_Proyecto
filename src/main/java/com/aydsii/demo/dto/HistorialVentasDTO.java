@@ -3,7 +3,7 @@ package com.aydsii.demo.dto;
 import java.time.LocalDate;
 import java.util.List;
 
-/** CU-03: respuesta completa del historial de ventas (lista + métricas). */
+// rta completa de historial de ventas: ventasdto, filtrodto, metricasdto
 public class HistorialVentasDTO {
 
     private LocalDate desde;

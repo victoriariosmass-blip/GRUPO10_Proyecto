@@ -18,13 +18,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * CU-03 Consultar historial de ventas.
- * Sigue el mismo orden de mensajes que el diagrama de secuencia. La consulta no modifica datos.
+ * CU-03 consultar historial de ventas
  */
 @Service
 public class VentaService {
 
-    // SLF4J: la clase solo conoce la interfaz Logger; la implementación (Log4j2) la elige el pom.xml
+    // SLF4J: la clase solo conoce la interfaz Logger; la implementación (Log4j2) se configura en pom.xml
     private static final Logger log = LoggerFactory.getLogger(VentaService.class);
 
     private final PedidoRepository pedidoRepository;

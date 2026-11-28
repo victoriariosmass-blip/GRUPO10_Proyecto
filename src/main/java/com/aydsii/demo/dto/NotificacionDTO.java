@@ -2,7 +2,6 @@ package com.aydsii.demo.dto;
 
 import java.time.LocalDateTime;
 
-/** Notificación emitida por el sistema, guardada en el RegistroNotificaciones (Singleton). */
 public class NotificacionDTO {
 
     private final LocalDateTime fechaHora;

@@ -16,7 +16,7 @@ import java.util.List;
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     /**
-     * CU-03: pedidos creados entre desde (inclusive) y hasta (exclusive) que están en
+     * pedidos creados entre desde (inclusive) y hasta (exclusive) que están en
      * alguno de los estados indicados, del más reciente al más antiguo.
      */
     @Query("SELECT p FROM Pedido p "

@@ -30,20 +30,20 @@ public class Producto {
     }
 
     /**
-     * RN-02: techo de la cantidad que se puede elegir de este producto.
-     * Es el menor entre el máximo de su categoría y el stock actual.
-     * Se usa al agregar productos al carrito (ABM carrito), no durante la compra.
+     * techo de la cantidad que se puede elegir de este producto
+     * el menor entre el máximo de su categoría y el stock actual
+     * se usa al agregar productos al carrito (ABM carrito), no durante la compra
      */
     public int cantidadMaximaSeleccionable() {
         return Math.min(categoria.getLimitePorPedido(), stock);
     }
 
-    /** Congela (descuenta) el stock al registrar el pedido. */
+    /** congela el stock al registrar el pedido. */
     public void reservarStock(int cantidad) {
         this.stock -= cantidad;
     }
 
-    /** CU-04, RN-03: devuelve al stock las unidades que había reservado el pedido. */
+    /** devuelve al stock las unidades que había reservado el pedido. */
     public void liberarStock(int cantidad) {
         this.stock += cantidad;
     }

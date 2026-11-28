@@ -7,14 +7,14 @@ import com.aydsii.demo.model.Pedido;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 
-/** CU-04: respuesta de la cancelación de un pedido. */
+// respuesta de la cancelación de un pedido
 public class CancelacionDTO {
 
     private Long pedidoId;
     private EstadoPedido estado;
     private LocalDateTime fechaCancelacion;
     private String mensaje;
-    private String enlaceWhatsApp;   // null si no había pago acreditado (FA-02)
+    private String enlaceWhatsApp;   // null si no había pago acreditado
 
     public CancelacionDTO(Pedido pedido, boolean pagoAcreditado, String enlace) {
         this.pedidoId = pedido.getId();

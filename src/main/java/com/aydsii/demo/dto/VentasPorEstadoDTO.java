@@ -1,7 +1,7 @@
 package com.aydsii.demo.dto;
 import com.aydsii.demo.model.EstadoPedido;
 
-/** CU-03: cuántas ventas hay en un estado. */
+// cant ventas por estado
 public class VentasPorEstadoDTO {
 
     private EstadoPedido estado;

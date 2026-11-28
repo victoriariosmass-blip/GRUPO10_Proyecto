@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
-/** Datos que manda el cliente al presionar "Comprar". */
+// datos que manda el cliente al comprar
 @Schema(description = "Datos para registrar la compra del carrito")
 public class CompraRequestDTO {
 

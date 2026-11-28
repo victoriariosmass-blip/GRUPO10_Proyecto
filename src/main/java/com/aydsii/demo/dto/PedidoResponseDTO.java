@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/** Resumen del pedido que se le devuelve al cliente después de comprar. */
 public class PedidoResponseDTO {
 
     private Long pedidoId;

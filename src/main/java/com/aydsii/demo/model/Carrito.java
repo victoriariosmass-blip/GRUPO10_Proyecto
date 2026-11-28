@@ -38,7 +38,7 @@ public class Carrito {
         return items;
     }
 
-    /** Borra los ítems del carrito (orphanRemoval los elimina de la base). */
+    /** borra los ítems del carrito (orphanRemoval los elimina de la base). */
     public void vaciar() {
         items.clear();
     }
